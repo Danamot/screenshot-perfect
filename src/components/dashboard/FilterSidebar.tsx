@@ -142,7 +142,7 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
                 onClick={() => onChange({ ...filters, saturation: level })}
                 className={cn(
                   "flex items-center justify-center gap-1.5 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  active && "bg-accent text-foreground shadow-card",
+                  active && "bg-primary/20 text-foreground ring-1 ring-primary/50",
                 )}
               >
                 {level !== "ALL" && <SaturationDot level={level} />}
