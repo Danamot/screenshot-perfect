@@ -34,7 +34,8 @@ describe("filterProducts", () => {
 
   it("orders results from highest to lowest trend", () => {
     const res = filterProducts(PRODUCTS, all);
-    expect(res[0].id).toBe("mini-proyector");
-    for (let i = 1; i < res.length; i++) expect(res[i - 1].trend).toBeGreaterThanOrEqual(res[i].trend);
+    expect(res[0]?.id).toBe("mini-proyector");
+    const trends = res.map((p) => p.trend);
+    expect(trends).toEqual([...trends].sort((a, b) => b - a));
   });
 });
