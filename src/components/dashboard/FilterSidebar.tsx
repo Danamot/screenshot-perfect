@@ -13,12 +13,16 @@ import {
   COUNTRIES,
   COUNTRY_ORDER,
   PRODUCTS,
+  SATURATION,
+  SATURATION_ORDER,
   SOURCES,
   SOURCE_ORDER,
   type ProductFilters,
   type SourceId,
 } from "@/lib/products";
 import { PlatformIcon } from "./PlatformIcon";
+import { SaturationDot } from "./SaturationBadge";
+import { cn } from "@/lib/utils";
 
 interface Props {
   filters: ProductFilters;
@@ -120,6 +124,30 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
                 <span className="flex-1 text-sm font-medium">{SOURCES[s].label}</span>
                 <span className="font-mono text-xs text-muted-foreground">{count}</span>
               </label>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <SectionLabel>Nivel de saturación</SectionLabel>
+        <div role="group" aria-label="Nivel de saturación" className="grid grid-cols-4 gap-1 rounded-lg border border-border bg-surface-elevated p-1">
+          {(["ALL", ...SATURATION_ORDER] as const).map((level) => {
+            const active = filters.saturation === level;
+            return (
+              <button
+                key={level}
+                type="button"
+                aria-pressed={active}
+                onClick={() => onChange({ ...filters, saturation: level })}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  active && "bg-accent text-foreground shadow-card",
+                )}
+              >
+                {level !== "ALL" && <SaturationDot level={level} />}
+                {level === "ALL" ? "Todas" : SATURATION[level].label}
+              </button>
             );
           })}
         </div>

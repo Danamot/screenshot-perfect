@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { PRODUCTS, SOURCE_ORDER, filterProducts } from "./products";
+import { PRODUCTS, SOURCE_ORDER, filterProducts, formatPrice, marginPercent } from "./products";
 
-const all = { country: "ALL" as const, sources: SOURCE_ORDER, query: "" };
+const all = { country: "ALL" as const, sources: SOURCE_ORDER, saturation: "ALL" as const, query: "" };
 
 describe("filterProducts", () => {
   it("ships at least 10 mock products covering Uruguay, México and Colombia", () => {
@@ -37,5 +37,31 @@ describe("filterProducts", () => {
     expect(res[0]?.id).toBe("mini-proyector");
     const trends = res.map((p) => p.trend);
     expect(trends).toEqual([...trends].sort((a, b) => b - a));
+  });
+
+  it("shows only products with the selected saturation level", () => {
+    for (const level of ["baja", "media", "alta"] as const) {
+      const res = filterProducts(PRODUCTS, { ...all, saturation: level });
+      expect(res.length).toBeGreaterThan(0);
+      expect(res.every((p) => p.saturation === level)).toBe(true);
+    }
+    expect(filterProducts(PRODUCTS, { ...all, saturation: "baja" }).map((p) => p.id)).toContain("lampara-luna");
+  });
+
+  it("combines saturation with country", () => {
+    const res = filterProducts(PRODUCTS, { ...all, country: "MX", saturation: "alta" });
+    expect(res.map((p) => p.id).sort()).toEqual(["corrector-postura", "masajeador-facial"]);
+  });
+});
+
+describe("commercial metrics", () => {
+  it("formats suggested price with local currency code", () => {
+    expect(formatPrice(1490, "UY")).toBe("$1.490 UYU");
+    expect(formatPrice(149, "BR")).toBe("R$149 BRL");
+  });
+
+  it("computes margin from price and cost", () => {
+    const p = PRODUCTS.find((x) => x.id === "mini-proyector")!;
+    expect(marginPercent(p)).toBe(65);
   });
 });

@@ -35,7 +35,12 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-const DEFAULT_FILTERS: ProductFilters = { country: "ALL", sources: [...SOURCE_ORDER], query: "" };
+const DEFAULT_FILTERS: ProductFilters = {
+  country: "ALL",
+  sources: [...SOURCE_ORDER],
+  saturation: "ALL",
+  query: "",
+};
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Activity; label: string; value: string }) {
   return (
@@ -97,7 +102,7 @@ function Dashboard() {
               <SearchX className="h-10 w-10 text-muted-foreground" />
               <p className="font-display text-lg font-semibold">Sin resultados con estos filtros</p>
               <p className="max-w-sm text-sm text-muted-foreground">
-                Prueba con otro país, activa más fuentes de datos o cambia la palabra clave.
+                Prueba con otro país, otro nivel de saturación, activa más fuentes o cambia la palabra clave.
               </p>
               <Button variant="surface" onClick={() => setFilters(DEFAULT_FILTERS)}>
                 Limpiar filtros
