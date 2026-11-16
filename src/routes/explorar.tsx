@@ -14,16 +14,16 @@ import {
   type ProductFilters,
 } from "@/lib/products";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/explorar")({
   head: () => ({
     meta: [
-      { title: "Radar Ganador — Productos ganadores para dropshipping en LATAM" },
+      { title: "Explorar productos ganadores — TrendLatam AI" },
       {
         name: "description",
         content:
           "Descubre productos virales en Uruguay, México, Colombia y más, con señales de TikTok, Instagram, Mercado Libre y Google Trends.",
       },
-      { property: "og:title", content: "Radar Ganador — Productos ganadores LATAM" },
+      { property: "og:title", content: "Explorar productos ganadores — TrendLatam AI" },
       {
         property: "og:description",
         content: "Dashboard de productos ganadores para e-commerce y dropshipping en Latinoamérica.",
@@ -68,7 +68,7 @@ function Dashboard() {
   const regionLabel = filters.country === "ALL" ? "Toda Latinoamérica" : COUNTRIES[filters.country].name;
 
   return (
-    <div className="min-h-screen lg:flex">
+    <div className="min-h-[calc(100vh-4rem)] lg:flex">
       <FilterSidebar filters={filters} onChange={setFilters} onReset={() => setFilters(DEFAULT_FILTERS)} />
 
       <main className="flex-1 bg-ambient">

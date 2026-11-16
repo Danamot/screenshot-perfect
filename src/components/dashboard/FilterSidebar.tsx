@@ -1,4 +1,4 @@
-import { Globe2, Radar, RotateCcw, Search } from "lucide-react";
+import { Globe2, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -45,15 +45,10 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
   };
 
   return (
-    <aside className="flex flex-col gap-7 border-b border-sidebar-border bg-sidebar p-5 lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r">
-      <div className="flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-brand shadow-glow">
-          <Radar className="h-5 w-5 text-primary-foreground" />
-        </span>
-        <div className="leading-tight">
-          <p className="font-display text-[15px] font-bold">Radar Ganador</p>
-          <p className="text-[11px] text-muted-foreground">Winning products · LATAM</p>
-        </div>
+    <aside className="flex flex-col gap-7 border-b border-sidebar-border bg-sidebar p-5 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:w-72 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r">
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <SlidersHorizontal className="h-4 w-4 text-primary-glow" />
+        Filtros
       </div>
 
       <div>
