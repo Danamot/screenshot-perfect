@@ -14,7 +14,7 @@ import {
   type ProductFilters,
 } from "@/lib/products";
 
-export const Route = createFileRoute("/explorar")({
+export const Route = createFileRoute("/_authenticated/explorar")({
   head: () => ({
     meta: [
       { title: "Explorar productos ganadores — TrendLatam AI" },

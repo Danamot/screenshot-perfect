@@ -192,3 +192,13 @@
     letter-spacing: -0.02em;
   }
 }
+
+/* Google sign-in button: Google's dark theme colors (brand guideline, not app tokens). */
+.btn-google {
+  background-color: #131314;
+  border: 1px solid #8e918f;
+  color: #e3e3e3;
+}
+.btn-google:hover {
+  background-color: #1e1f20;
+}
