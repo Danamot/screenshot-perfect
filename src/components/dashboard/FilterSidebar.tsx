@@ -73,7 +73,17 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
           onValueChange={(v) => onChange({ ...filters, country: v as ProductFilters["country"] })}
         >
           <SelectTrigger aria-label="País o región" className="h-10 bg-surface-elevated">
-            <SelectValue />
+            <SelectValue>
+              {filters.country === "ALL" ? (
+                <span className="flex items-center gap-2">
+                  <Globe2 className="h-4 w-4 text-electric" /> Toda Latinoamérica
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <span aria-hidden>{COUNTRIES[filters.country].flag}</span> {COUNTRIES[filters.country].name}
+                </span>
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">

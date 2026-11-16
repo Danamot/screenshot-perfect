@@ -10,8 +10,8 @@ export function TrendMeter({ value, className }: { value: number; className?: st
           {hot && <Flame className="h-3.5 w-3.5 text-primary-glow" />}
           Viralidad
         </span>
-        <span className="font-mono text-sm font-semibold text-foreground">
-          {value}% <span className="text-muted-foreground font-normal">tendencia</span>
+        <span className="text-sm text-muted-foreground">
+          <span className="font-mono font-semibold text-foreground">{value}%</span> tendencia
         </span>
       </div>
       <div

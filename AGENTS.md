@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Product mock data, filter logic and formatting helpers live in `src/lib/products.ts`; UI components in `src/components/dashboard/` only render — keeps filter rules unit-testable (`src/lib/products.test.ts`).
+- The app is dark-only: dark palette lives directly on `:root` in `src/styles.css` and `<html>` carries `dark`; there is no theme toggle.
