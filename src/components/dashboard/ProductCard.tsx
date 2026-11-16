@@ -1,11 +1,17 @@
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { COUNTRIES, type Product } from "@/lib/products";
+import { COUNTRIES, marginPercent, priceParts, type Product } from "@/lib/products";
 import { PlatformIcon } from "./PlatformIcon";
 import { TrendMeter } from "./TrendMeter";
+import { SaturationBadge } from "./SaturationBadge";
+
+function MetricLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{children}</p>;
+}
 
 export function ProductCard({ product, onAnalyze }: { product: Product; onAnalyze: () => void }) {
   const country = COUNTRIES[product.country];
+  const price = priceParts(product.price, product.country);
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40">
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -36,6 +42,27 @@ export function ProductCard({ product, onAnalyze }: { product: Product; onAnalyz
         <h3 className="line-clamp-2 min-h-[2.75rem] text-[15px] font-semibold leading-snug">
           {product.name}
         </h3>
+
+        <dl className="grid grid-cols-[1.2fr_1fr_1fr] divide-x divide-border rounded-lg border border-border bg-surface-elevated py-2">
+          <div className="min-w-0 px-2">
+            <dt><MetricLabel>Precio est.</MetricLabel></dt>
+            <dd className="mt-0.5 flex flex-wrap items-baseline gap-x-1 font-mono text-sm font-semibold">
+              {price.amount} <span className="text-[10px] font-medium text-muted-foreground">{price.code}</span>
+            </dd>
+          </div>
+          <div className="min-w-0 px-2">
+            <dt><MetricLabel>Margen</MetricLabel></dt>
+            <dd className="mt-0.5 whitespace-nowrap font-mono text-sm font-semibold text-success">
+              {marginPercent(product)}% <span className="font-sans text-[10px] font-medium">margen</span>
+            </dd>
+          </div>
+          <div className="min-w-0 px-2">
+            <dt><MetricLabel>Saturación</MetricLabel></dt>
+            <dd className="mt-0.5">
+              <SaturationBadge level={product.saturation} />
+            </dd>
+          </div>
+        </dl>
 
         <TrendMeter value={product.trend} />
 
