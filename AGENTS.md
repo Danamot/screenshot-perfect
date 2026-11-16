@@ -33,3 +33,6 @@ use the editor.
 
 - Product mock data, filter logic and formatting helpers live in `src/lib/products.ts`; UI components in `src/components/dashboard/` only render — keeps filter rules unit-testable (`src/lib/products.test.ts`).
 - The app is dark-only: dark palette lives directly on `:root` in `src/styles.css` and `<html>` carries `dark`; there is no theme toggle.
+- Shared top navigation and the toast container live in `src/routes/__root.tsx` around `<Outlet />`; pages are separate routes (`/` landing, `/explorar` dashboard, `/precios`) so each has its own head metadata.
+- Plan names, prices and limits live in `src/lib/plans.ts` (tested in `src/lib/plans.test.ts`); pricing UI only renders them.
+
