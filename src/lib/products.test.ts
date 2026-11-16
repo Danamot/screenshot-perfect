@@ -1,56 +1,97 @@
 import { describe, expect, it } from "vitest";
-import { PRODUCTS, SOURCE_ORDER, filterProducts, formatPrice, marginPercent } from "./products";
+import { SOURCE_ORDER, filterProducts, formatPrice, rowToProduct, type Product } from "./products";
 
 const all = { country: "ALL" as const, sources: SOURCE_ORDER, saturation: "ALL" as const, query: "" };
 
-describe("filterProducts", () => {
-  it("ships at least 10 mock products covering Uruguay, México and Colombia", () => {
-    expect(PRODUCTS.length).toBeGreaterThanOrEqual(10);
-    for (const c of ["UY", "MX", "CO"]) {
-      expect(PRODUCTS.some((p) => p.country === c)).toBe(true);
-    }
-  });
+function make(id: string, over: Partial<Product>): Product {
+  return {
+    id,
+    name: id,
+    category: "Hogar",
+    country: "UY",
+    sources: ["tiktok"],
+    trend: 50,
+    growth7d: 10,
+    image: "",
+    price: 100,
+    margin: 60,
+    activeAds: 0,
+    competitors: 0,
+    saturation: "media",
+    keywords: [],
+    series: [],
+    analysis: null,
+    ...over,
+  };
+}
 
+const FIXTURE: Product[] = [
+  make("mini-proyector", { country: "UY", trend: 94, sources: ["tiktok", "mercadolibre"], saturation: "media" }),
+  make("masajeador-facial", { country: "MX", trend: 92, sources: ["tiktok", "google"], saturation: "alta" }),
+  make("corrector-postura", { country: "MX", trend: 89, sources: ["tiktok", "instagram"], saturation: "alta" }),
+  make("lampara-luna", { name: "Lámpara Luna 3D", country: "UY", trend: 77, sources: ["instagram"], saturation: "baja" }),
+  make("auriculares-oseos", { country: "MX", trend: 71, sources: ["google"], saturation: "baja" }),
+];
+
+describe("filterProducts", () => {
   it("shows only the selected country", () => {
-    const res = filterProducts(PRODUCTS, { ...all, country: "UY" });
-    expect(res.length).toBeGreaterThan(0);
-    expect(res.every((p) => p.country === "UY")).toBe(true);
+    const res = filterProducts(FIXTURE, { ...all, country: "UY" });
+    expect(res.map((p) => p.id)).toEqual(["mini-proyector", "lampara-luna"]);
   });
 
   it("hides products whose sources are all turned off", () => {
-    const res = filterProducts(PRODUCTS, { ...all, sources: ["google"] });
-    expect(res.every((p) => p.sources.includes("google"))).toBe(true);
-    expect(res.find((p) => p.id === "mini-proyector")).toBeUndefined();
+    const res = filterProducts(FIXTURE, { ...all, sources: ["google"] });
+    expect(res.map((p) => p.id)).toEqual(["masajeador-facial", "auriculares-oseos"]);
   });
 
   it("shows nothing when every source is off", () => {
-    expect(filterProducts(PRODUCTS, { ...all, sources: [] })).toHaveLength(0);
+    expect(filterProducts(FIXTURE, { ...all, sources: [] })).toHaveLength(0);
   });
 
   it("matches keywords ignoring accents and case", () => {
-    const res = filterProducts(PRODUCTS, { ...all, query: "LAMPARA" });
+    const res = filterProducts(FIXTURE, { ...all, query: "LAMPARA" });
     expect(res.map((p) => p.id)).toEqual(["lampara-luna"]);
   });
 
   it("orders results from highest to lowest trend", () => {
-    const res = filterProducts(PRODUCTS, all);
-    expect(res[0]?.id).toBe("mini-proyector");
-    const trends = res.map((p) => p.trend);
-    expect(trends).toEqual([...trends].sort((a, b) => b - a));
-  });
-
-  it("shows only products with the selected saturation level", () => {
-    for (const level of ["baja", "media", "alta"] as const) {
-      const res = filterProducts(PRODUCTS, { ...all, saturation: level });
-      expect(res.length).toBeGreaterThan(0);
-      expect(res.every((p) => p.saturation === level)).toBe(true);
-    }
-    expect(filterProducts(PRODUCTS, { ...all, saturation: "baja" }).map((p) => p.id)).toContain("lampara-luna");
+    const trends = filterProducts(FIXTURE, all).map((p) => p.trend);
+    expect(trends).toEqual([94, 92, 89, 77, 71]);
   });
 
   it("combines saturation with country", () => {
-    const res = filterProducts(PRODUCTS, { ...all, country: "MX", saturation: "alta" });
+    const res = filterProducts(FIXTURE, { ...all, country: "MX", saturation: "alta" });
     expect(res.map((p) => p.id).sort()).toEqual(["corrector-postura", "masajeador-facial"]);
+  });
+});
+
+describe("database rows", () => {
+  const row = {
+    slug: "mini-proyector",
+    nombre: "Mini Proyector",
+    pais: "UY",
+    categoria: "Electrónica",
+    precio_estimado: 3290,
+    margen: 65,
+    saturacion: "media",
+    viralidad: 94,
+    crecimiento_7d: 48,
+    fuentes: ["tiktok", "mercadolibre"],
+    imagen_url: "/products/mini-proyector.jpg",
+    analisis_ia: { resumen: "Explota en TikTok", puntos: ["Margen alto"] },
+    palabras_clave: ["proyector"],
+    anuncios_activos: 214,
+    competidores: 38,
+    interes_semanal: [10, 94],
+  };
+
+  it("maps a product row to card data", () => {
+    const p = rowToProduct(row);
+    expect(p).toMatchObject({ id: "mini-proyector", country: "UY", price: 3290, margin: 65, trend: 94 });
+    expect(p.analysis).toEqual({ resumen: "Explota en TikTok", puntos: ["Margen alto"] });
+  });
+
+  it("treats a missing AI analysis as locked", () => {
+    expect(rowToProduct({ ...row, analisis_ia: null }).analysis).toBeNull();
   });
 });
 
@@ -58,10 +99,5 @@ describe("commercial metrics", () => {
   it("formats suggested price with local currency code", () => {
     expect(formatPrice(1490, "UY")).toBe("$1.490 UYU");
     expect(formatPrice(149, "BR")).toBe("R$149 BRL");
-  });
-
-  it("computes margin from price and cost", () => {
-    const p = PRODUCTS.find((x) => x.id === "mini-proyector")!;
-    expect(marginPercent(p)).toBe(65);
   });
 });
