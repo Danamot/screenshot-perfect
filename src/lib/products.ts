@@ -16,14 +16,14 @@ export type SourceId = "tiktok" | "instagram" | "mercadolibre" | "google";
 
 export const COUNTRIES: Record<
   CountryCode,
-  { name: string; flag: string; currency: string; mlDomain: string }
+  { name: string; flag: string; currency: string; symbol: string; mlDomain: string }
 > = {
-  UY: { name: "Uruguay", flag: "🇺🇾", currency: "$U", mlDomain: "listado.mercadolibre.com.uy" },
-  MX: { name: "México", flag: "🇲🇽", currency: "MXN $", mlDomain: "listado.mercadolibre.com.mx" },
-  CO: { name: "Colombia", flag: "🇨🇴", currency: "COP $", mlDomain: "listado.mercadolibre.com.co" },
-  AR: { name: "Argentina", flag: "🇦🇷", currency: "ARS $", mlDomain: "listado.mercadolibre.com.ar" },
-  CL: { name: "Chile", flag: "🇨🇱", currency: "CLP $", mlDomain: "listado.mercadolibre.cl" },
-  BR: { name: "Brasil", flag: "🇧🇷", currency: "R$", mlDomain: "lista.mercadolivre.com.br" },
+  UY: { name: "Uruguay", flag: "🇺🇾", currency: "UYU", symbol: "$", mlDomain: "listado.mercadolibre.com.uy" },
+  MX: { name: "México", flag: "🇲🇽", currency: "MXN", symbol: "$", mlDomain: "listado.mercadolibre.com.mx" },
+  CO: { name: "Colombia", flag: "🇨🇴", currency: "COP", symbol: "$", mlDomain: "listado.mercadolibre.com.co" },
+  AR: { name: "Argentina", flag: "🇦🇷", currency: "ARS", symbol: "$", mlDomain: "listado.mercadolibre.com.ar" },
+  CL: { name: "Chile", flag: "🇨🇱", currency: "CLP", symbol: "$", mlDomain: "listado.mercadolibre.cl" },
+  BR: { name: "Brasil", flag: "🇧🇷", currency: "BRL", symbol: "R$", mlDomain: "lista.mercadolivre.com.br" },
 };
 
 export const COUNTRY_ORDER: CountryCode[] = ["UY", "MX", "CO", "AR", "CL", "BR"];
@@ -36,6 +36,17 @@ export const SOURCES: Record<SourceId, { label: string }> = {
 };
 
 export const SOURCE_ORDER: SourceId[] = ["tiktok", "instagram", "mercadolibre", "google"];
+
+/** Nivel de competencia actual del producto en su país. */
+export type SaturationLevel = "baja" | "media" | "alta";
+
+export const SATURATION: Record<SaturationLevel, { label: string }> = {
+  baja: { label: "Baja" },
+  media: { label: "Media" },
+  alta: { label: "Alta" },
+};
+
+export const SATURATION_ORDER: SaturationLevel[] = ["baja", "media", "alta"];
 
 export interface Product {
   id: string;
@@ -52,6 +63,7 @@ export interface Product {
   cost: number;
   activeAds: number;
   competitors: number;
+  saturation: SaturationLevel;
   keywords: string[];
   /** Interés semanal de las últimas 12 semanas (0–100) */
   series: number[];
@@ -89,6 +101,7 @@ export const PRODUCTS: Product[] = [
     cost: 1150,
     activeAds: 214,
     competitors: 38,
+    saturation: "media",
     keywords: ["proyector", "cine en casa", "netflix", "android"],
     series: buildSeries(1, 94, "spike"),
     whyIntro:
@@ -112,6 +125,7 @@ export const PRODUCTS: Product[] = [
     cost: 165,
     activeAds: 342,
     competitors: 71,
+    saturation: "alta",
     keywords: ["postura", "espalda", "home office", "sensor"],
     series: buildSeries(2, 89, "rising"),
     whyIntro:
@@ -135,6 +149,7 @@ export const PRODUCTS: Product[] = [
     cost: 21000,
     activeAds: 128,
     competitors: 54,
+    saturation: "media",
     keywords: ["termo", "botella", "regalo", "oficina"],
     series: buildSeries(3, 81, "steady"),
     whyIntro:
@@ -158,6 +173,7 @@ export const PRODUCTS: Product[] = [
     cost: 820,
     activeAds: 96,
     competitors: 19,
+    saturation: "baja",
     keywords: ["lámpara", "luna", "decoración", "regalo"],
     series: buildSeries(4, 77, "rising"),
     whyIntro:
@@ -181,6 +197,7 @@ export const PRODUCTS: Product[] = [
     cost: 120,
     activeAds: 418,
     competitors: 63,
+    saturation: "alta",
     keywords: ["gua sha", "skincare", "facial", "cuarzo rosa"],
     series: buildSeries(5, 92, "spike"),
     whyIntro:
@@ -204,6 +221,7 @@ export const PRODUCTS: Product[] = [
     cost: 38000,
     activeAds: 265,
     competitors: 47,
+    saturation: "media",
     keywords: ["alisador", "cabello", "plancha", "iónico"],
     series: buildSeries(6, 87, "rising"),
     whyIntro:
@@ -227,6 +245,7 @@ export const PRODUCTS: Product[] = [
     cost: 11500,
     activeAds: 74,
     competitors: 41,
+    saturation: "media",
     keywords: ["organizador", "maquillaje", "tocador", "acrílico"],
     series: buildSeries(7, 73, "steady"),
     whyIntro:
@@ -250,6 +269,7 @@ export const PRODUCTS: Product[] = [
     cost: 34000,
     activeAds: 52,
     competitors: 22,
+    saturation: "baja",
     keywords: ["comedero", "mascotas", "perro", "gato", "wifi"],
     series: buildSeries(8, 68, "steady"),
     whyIntro:
@@ -273,6 +293,7 @@ export const PRODUCTS: Product[] = [
     cost: 42,
     activeAds: 389,
     competitors: 88,
+    saturation: "alta",
     keywords: ["licuadora", "smoothie", "fitness", "usb"],
     series: buildSeries(9, 84, "rising"),
     whyIntro:
@@ -296,6 +317,7 @@ export const PRODUCTS: Product[] = [
     cost: 210,
     activeAds: 118,
     competitors: 26,
+    saturation: "baja",
     keywords: ["pelos", "mascotas", "sillón", "limpieza"],
     series: buildSeries(10, 79, "rising"),
     whyIntro:
@@ -319,6 +341,7 @@ export const PRODUCTS: Product[] = [
     cost: 310,
     activeAds: 88,
     competitors: 34,
+    saturation: "baja",
     keywords: ["auriculares", "running", "ciclismo", "bluetooth"],
     series: buildSeries(11, 71, "steady"),
     whyIntro:
@@ -342,6 +365,7 @@ export const PRODUCTS: Product[] = [
     cost: 16000,
     activeAds: 301,
     competitors: 59,
+    saturation: "alta",
     keywords: ["led", "rgb", "setup", "gamer", "habitación"],
     series: buildSeries(12, 86, "spike"),
     whyIntro:
@@ -357,6 +381,7 @@ export const PRODUCTS: Product[] = [
 export interface ProductFilters {
   country: CountryCode | "ALL";
   sources: SourceId[];
+  saturation: SaturationLevel | "ALL";
   query: string;
 }
 
@@ -369,13 +394,14 @@ function normalize(text: string) {
 
 /**
  * Filtra por país, por fuentes activas (alcanza con que el producto sea fuerte en una
- * de ellas) y por palabra clave en nombre, categoría o keywords. Ordena por tendencia.
+ * de ellas), por nivel de saturación y por palabra clave en nombre, categoría o keywords. Ordena por tendencia.
  */
 export function filterProducts(products: Product[], filters: ProductFilters): Product[] {
   const q = normalize(filters.query.trim());
   return products
     .filter((p) => filters.country === "ALL" || p.country === filters.country)
     .filter((p) => p.sources.some((s) => filters.sources.includes(s)))
+    .filter((p) => filters.saturation === "ALL" || p.saturation === filters.saturation)
     .filter((p) => {
       if (!q) return true;
       const haystack = normalize([p.name, p.category, ...p.keywords].join(" "));
@@ -384,8 +410,16 @@ export function filterProducts(products: Product[], filters: ProductFilters): Pr
     .sort((a, b) => b.trend - a.trend);
 }
 
+/** Precio separado en monto con símbolo ("$1.490") y código de moneda ("UYU"). */
+export function priceParts(value: number, country: CountryCode) {
+  const c = COUNTRIES[country];
+  return { amount: `${c.symbol}${value.toLocaleString("es-UY")}`, code: c.currency };
+}
+
+/** Ej.: "$1.490 UYU", "R$149 BRL". */
 export function formatPrice(value: number, country: CountryCode) {
-  return `${COUNTRIES[country].currency} ${value.toLocaleString("es-UY")}`;
+  const { amount, code } = priceParts(value, country);
+  return `${amount} ${code}`;
 }
 
 export function marginPercent(p: Product) {
