@@ -108,7 +108,7 @@ function PreviewPanel() {
 
 function Landing() {
   return (
-    <main className="bg-ambient">
+    <main className="overflow-x-clip bg-ambient">
       <section className="mx-auto grid max-w-[1400px] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[1.15fr_1fr] lg:pt-24">
         <div className="min-w-0 space-y-7">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface-elevated px-3 py-1 text-xs font-medium text-muted-foreground">
