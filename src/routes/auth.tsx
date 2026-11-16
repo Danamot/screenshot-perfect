@@ -62,7 +62,7 @@ function AuthPage() {
     if (!ready || !user) return;
     const target = safeRedirect(sessionStorage.getItem(RETURN_KEY) ?? search.redirect);
     sessionStorage.removeItem(RETURN_KEY);
-    navigate({ to: target, replace: true });
+    navigate({ href: target, replace: true });
   }, [ready, user, navigate, search.redirect]);
 
   async function handleLogin(e: FormEvent<HTMLFormElement>) {
