@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PLANS, formatPlanPrice } from "./plans";
+import { PLANS, formatPlanPrice, getAccess } from "./plans";
 
 const free = PLANS.find((p) => p.id === "free")!;
 const pro = PLANS.find((p) => p.id === "pro")!;
@@ -24,5 +24,19 @@ describe("plans", () => {
       expect(pro.features.find((f) => f.label === label)?.included).toBe(true);
       expect(free.features.find((f) => f.label === label)?.included).toBe(false);
     }
+  });
+
+  it("free accounts see 3 products of 1 country, without saturation filter or AI analysis", () => {
+    const a = getAccess({ plan: "free", isAdmin: false });
+    expect(a).toEqual({ fullAccess: false, productsPerDay: 3, countries: 1, canFilterSaturation: false, canSeeAiAnalysis: false });
+  });
+
+  it("pro accounts get everything", () => {
+    const a = getAccess({ plan: "pro", isAdmin: false });
+    expect(a).toEqual({ fullAccess: true, productsPerDay: null, countries: null, canFilterSaturation: true, canSeeAiAnalysis: true });
+  });
+
+  it("admins get everything even on the free plan", () => {
+    expect(getAccess({ plan: "free", isAdmin: true }).fullAccess).toBe(true);
   });
 });

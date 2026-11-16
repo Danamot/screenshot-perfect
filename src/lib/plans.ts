@@ -55,3 +55,27 @@ export const PLANS: Plan[] = [
 export function formatPlanPrice(plan: Plan) {
   return plan.priceUsd === 0 ? "$0" : `$${plan.priceUsd} USD`;
 }
+
+/** Lo que una cuenta puede ver en el dashboard según su plan. */
+export interface Access {
+  /** Pro o administrador: todo desbloqueado. */
+  fullAccess: boolean;
+  /** Productos visibles por día; null = ilimitado. */
+  productsPerDay: number | null;
+  /** Países disponibles; null = todos. */
+  countries: number | null;
+  canFilterSaturation: boolean;
+  canSeeAiAnalysis: boolean;
+}
+
+export function getAccess(account: { plan: PlanId; isAdmin: boolean }): Access {
+  const full = account.isAdmin || account.plan === "pro";
+  const plan = PLANS.find((p) => p.id === (full ? "pro" : "free"))!;
+  return {
+    fullAccess: full,
+    productsPerDay: plan.productsPerDay,
+    countries: plan.countries,
+    canFilterSaturation: full,
+    canSeeAiAnalysis: full,
+  };
+}

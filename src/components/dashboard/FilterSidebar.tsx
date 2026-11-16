@@ -1,4 +1,5 @@
-import { Globe2, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Globe2, Lock, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,12 @@ import {
 import {
   COUNTRIES,
   COUNTRY_ORDER,
-  PRODUCTS,
   SATURATION,
   SATURATION_ORDER,
   SOURCES,
   SOURCE_ORDER,
+  type CountryCode,
+  type Product,
   type ProductFilters,
   type SourceId,
 } from "@/lib/products";
@@ -26,19 +28,36 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   filters: ProductFilters;
+  /** Productos disponibles para el usuario (para los contadores por fuente). */
+  products: Product[];
+  /** Plan Gratuito: país fijo, sin selector. */
+  lockedCountry?: CountryCode | null | undefined;
+  /** Plan Gratuito: filtro de saturación bloqueado. */
+  saturationLocked?: boolean | undefined;
   onChange: (next: ProductFilters) => void;
   onReset: () => void;
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+    <p className="mb-2.5 flex items-center text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
       {children}
     </p>
   );
 }
 
-export function FilterSidebar({ filters, onChange, onReset }: Props) {
+function ProChip() {
+  return (
+    <Link
+      to="/precios"
+      className="ml-2 inline-flex items-center gap-1 rounded-full bg-gradient-brand px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-primary-foreground normal-case"
+    >
+      <Lock className="h-2.5 w-2.5" /> PRO
+    </Link>
+  );
+}
+
+export function FilterSidebar({ filters, products, lockedCountry, saturationLocked, onChange, onReset }: Props) {
   const toggleSource = (s: SourceId, on: boolean) => {
     const sources = on ? [...filters.sources, s] : filters.sources.filter((x) => x !== s);
     onChange({ ...filters, sources });
@@ -66,39 +85,52 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
       </div>
 
       <div>
-        <SectionLabel>País / Región</SectionLabel>
-        <Select
-          value={filters.country}
-          onValueChange={(v) => onChange({ ...filters, country: v as ProductFilters["country"] })}
-        >
-          <SelectTrigger aria-label="País o región" className="h-10 bg-surface-elevated">
-            <SelectValue>
-              {filters.country === "ALL" ? (
+        <SectionLabel>País / Región{lockedCountry !== undefined && <ProChip />}</SectionLabel>
+        {lockedCountry !== undefined ? (
+          <div className="flex h-10 items-center gap-2 rounded-md border border-input bg-surface-elevated px-3 text-sm">
+            {lockedCountry ? (
+              <>
+                <span aria-hidden>{COUNTRIES[lockedCountry].flag}</span> {COUNTRIES[lockedCountry].name}
+              </>
+            ) : (
+              <span className="text-muted-foreground">Elige tu país</span>
+            )}
+            <Lock className="ml-auto h-3.5 w-3.5 text-muted-foreground" aria-label="País fijo en el Plan Gratuito" />
+          </div>
+        ) : (
+          <Select
+            value={filters.country}
+            onValueChange={(v) => onChange({ ...filters, country: v as ProductFilters["country"] })}
+          >
+            <SelectTrigger aria-label="País o región" className="h-10 bg-surface-elevated">
+              <SelectValue>
+                {filters.country === "ALL" ? (
+                  <span className="flex items-center gap-2">
+                    <Globe2 className="h-4 w-4 text-electric" /> Toda Latinoamérica
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <span aria-hidden>{COUNTRIES[filters.country].flag}</span> {COUNTRIES[filters.country].name}
+                  </span>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">
                 <span className="flex items-center gap-2">
                   <Globe2 className="h-4 w-4 text-electric" /> Toda Latinoamérica
                 </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <span aria-hidden>{COUNTRIES[filters.country].flag}</span> {COUNTRIES[filters.country].name}
-                </span>
-              )}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">
-              <span className="flex items-center gap-2">
-                <Globe2 className="h-4 w-4 text-electric" /> Toda Latinoamérica
-              </span>
-            </SelectItem>
-            {COUNTRY_ORDER.map((c) => (
-              <SelectItem key={c} value={c}>
-                <span className="flex items-center gap-2">
-                  <span aria-hidden>{COUNTRIES[c].flag}</span> {COUNTRIES[c].name}
-                </span>
               </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              {COUNTRY_ORDER.map((c) => (
+                <SelectItem key={c} value={c}>
+                  <span className="flex items-center gap-2">
+                    <span aria-hidden>{COUNTRIES[c].flag}</span> {COUNTRIES[c].name}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div>
@@ -106,7 +138,7 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
         <div className="flex flex-col gap-1.5">
           {SOURCE_ORDER.map((s) => {
             const checked = filters.sources.includes(s);
-            const count = PRODUCTS.filter((p) => p.sources.includes(s)).length;
+            const count = products.filter((p) => p.sources.includes(s)).length;
             const id = `source-${s}`;
             return (
               <label
@@ -125,8 +157,10 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
       </div>
 
       <div>
-        <SectionLabel>Nivel de saturación</SectionLabel>
-        <div role="group" aria-label="Nivel de saturación" className="grid grid-cols-4 gap-1 rounded-lg border border-border bg-surface-elevated p-1">
+        <SectionLabel>Nivel de saturación{saturationLocked && <ProChip />}</SectionLabel>
+        <div role="group" aria-label="Nivel de saturación" aria-disabled={saturationLocked || undefined}
+          className={cn("grid grid-cols-4 gap-1 rounded-lg border border-border bg-surface-elevated p-1", saturationLocked && "opacity-50")}
+        >
           {(["ALL", ...SATURATION_ORDER] as const).map((level) => {
             const active = filters.saturation === level;
             return (
@@ -134,9 +168,10 @@ export function FilterSidebar({ filters, onChange, onReset }: Props) {
                 key={level}
                 type="button"
                 aria-pressed={active}
+                disabled={saturationLocked}
                 onClick={() => onChange({ ...filters, saturation: level })}
                 className={cn(
-                  "flex items-center justify-center gap-1.5 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex items-center justify-center gap-1.5 rounded-md px-1 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:hover:text-muted-foreground",
                   active && "bg-primary/20 text-foreground ring-1 ring-primary/50",
                 )}
               >

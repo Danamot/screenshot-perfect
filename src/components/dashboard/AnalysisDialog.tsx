@@ -1,11 +1,11 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { BadgeDollarSign, ExternalLink, Megaphone, Percent, Sparkles, Store } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BadgeDollarSign, Crown, ExternalLink, Lock, Megaphone, Percent, Sparkles, Store } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   COUNTRIES,
   formatPrice,
-  marginPercent,
   mercadoLibreSearchUrl,
   tiktokSearchUrl,
   type Product,
@@ -121,27 +121,48 @@ function AnalysisBody({ product }: { product: Product }) {
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Metric icon={BadgeDollarSign} label="Precio sugerido" value={formatPrice(product.price, product.country)} />
-          <Metric icon={Percent} label="Margen" value={`${marginPercent(product)}%`} />
+          <Metric icon={Percent} label="Margen" value={`${product.margin}%`} />
           <Metric icon={Megaphone} label="Anuncios activos" value={String(product.activeAds)} />
           <Metric icon={Store} label="Competidores" value={String(product.competitors)} />
         </section>
 
-        <section className="rounded-xl border border-primary/30 bg-accent/40 p-5">
-          <h4 className="flex items-center gap-2 text-sm font-semibold">
-            <Sparkles className="h-4 w-4 text-primary-glow" />
-            Por qué es ganador en {country.name}
-          </h4>
-          <p className="mt-2 text-sm leading-relaxed text-foreground/90">{product.whyIntro}</p>
-          <ul className="mt-3 space-y-1.5">
-            {product.whyPoints.map((pt) => (
-              <li key={pt} className="flex gap-2 text-sm text-muted-foreground">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-brand" />
-                {pt}
-              </li>
-            ))}
-          </ul>
-          <TrendMeter value={product.trend} className="mt-4" />
-        </section>
+        {product.analysis ? (
+          <section className="rounded-xl border border-primary/30 bg-accent/40 p-5">
+            <h4 className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-primary-glow" />
+              Por qué es ganador en {country.name}
+            </h4>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/90">{product.analysis.resumen}</p>
+            <ul className="mt-3 space-y-1.5">
+              {product.analysis.puntos.map((pt) => (
+                <li key={pt} className="flex gap-2 text-sm text-muted-foreground">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-brand" />
+                  {pt}
+                </li>
+              ))}
+            </ul>
+            <TrendMeter value={product.trend} className="mt-4" />
+          </section>
+        ) : (
+          <section className="relative overflow-hidden rounded-xl border border-primary/30 bg-accent/40 p-5">
+            <div aria-hidden className="space-y-2 blur-sm select-none">
+              <div className="h-3 w-2/3 rounded bg-muted-foreground/30" />
+              <div className="h-3 w-full rounded bg-muted-foreground/20" />
+              <div className="h-3 w-5/6 rounded bg-muted-foreground/20" />
+              <div className="h-3 w-1/2 rounded bg-muted-foreground/20" />
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/60 p-4 text-center backdrop-blur-[2px]">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <Lock className="h-4 w-4 text-primary-glow" /> El análisis de IA completo es parte del Plan Pro
+              </p>
+              <Button variant="glow" size="sm" asChild>
+                <Link to="/precios">
+                  <Crown /> Ver Plan Pro
+                </Link>
+              </Button>
+            </div>
+          </section>
+        )}
 
         <section className="grid gap-3 sm:grid-cols-2">
           <Button variant="surface" size="lg" asChild>

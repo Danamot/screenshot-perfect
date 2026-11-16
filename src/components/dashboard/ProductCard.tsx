@@ -1,6 +1,6 @@
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { COUNTRIES, marginPercent, priceParts, type Product } from "@/lib/products";
+import { COUNTRIES, priceParts, type Product } from "@/lib/products";
 import { PlatformIcon } from "./PlatformIcon";
 import { TrendMeter } from "./TrendMeter";
 import { SaturationBadge } from "./SaturationBadge";
@@ -53,7 +53,7 @@ export function ProductCard({ product, onAnalyze }: { product: Product; onAnalyz
           <div className="min-w-0 px-2">
             <dt><MetricLabel>Margen</MetricLabel></dt>
             <dd className="mt-0.5 whitespace-nowrap font-mono text-sm font-semibold text-success">
-              {marginPercent(product)}% <span className="font-sans text-[10px] font-medium">margen</span>
+              {product.margin}% <span className="font-sans text-[10px] font-medium">margen</span>
             </dd>
           </div>
           <div className="min-w-0 px-2">

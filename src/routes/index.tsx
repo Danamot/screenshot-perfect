@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, BadgeDollarSign, Globe2, Layers, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlatformIcon } from "@/components/dashboard/PlatformIcon";
@@ -6,13 +7,17 @@ import { SaturationBadge } from "@/components/dashboard/SaturationBadge";
 import {
   COUNTRIES,
   COUNTRY_ORDER,
-  PRODUCTS,
+  SATURATION_ORDER,
   SOURCE_ORDER,
+  type CountryCode,
+  type SaturationLevel,
   type SourceId,
-  filterProducts,
-  marginPercent,
   priceParts,
 } from "@/lib/products";
+import { getLandingPreview } from "@/lib/preview.functions";
+
+const previewQueryOptions = () =>
+  queryOptions({ queryKey: ["landing-preview"], queryFn: () => getLandingPreview(), staleTime: 5 * 60_000 });
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,6 +37,9 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(previewQueryOptions());
+  },
   component: Landing,
 });
 
@@ -64,7 +72,19 @@ const ADVANTAGES = [
 ] as const;
 
 function PreviewPanel() {
-  const top = filterProducts(PRODUCTS, { country: "ALL", sources: [...SOURCE_ORDER], saturation: "ALL", query: "" }).slice(0, 3);
+  const { data } = useSuspenseQuery(previewQueryOptions());
+  const top = data
+    .filter((p) => p.pais in COUNTRIES)
+    .map((p) => ({
+      id: p.slug,
+      name: p.nombre,
+      country: p.pais as CountryCode,
+      price: p.precio,
+      margin: p.margen,
+      trend: p.viralidad,
+      image: p.imagen,
+      saturation: ((SATURATION_ORDER as string[]).includes(p.saturacion) ? p.saturacion : "media") as SaturationLevel,
+    }));
   return (
     <div className="relative min-w-0">
       <div aria-hidden className="absolute -inset-6 rounded-3xl bg-gradient-brand opacity-20 blur-3xl" />
@@ -90,7 +110,7 @@ function PreviewPanel() {
                   </div>
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                     <span className="font-mono text-foreground">{price.amount} {price.code}</span>
-                    <span className="font-mono font-semibold text-success">{marginPercent(p)}% margen</span>
+                    <span className="font-mono font-semibold text-success">{p.margin}% margen</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
