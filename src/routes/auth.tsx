@@ -16,9 +16,9 @@ import { safeRedirect } from "@/lib/redirect";
 const RETURN_KEY = "trendlatam:return-to";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { redirect?: string; modo?: "registro" } => ({
-    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
-    modo: search.modo === "registro" ? "registro" : undefined,
+  validateSearch: (search: Record<string, unknown>): { redirect?: string | undefined; modo?: "registro" | undefined } => ({
+    redirect: typeof search["redirect"] === "string" ? search["redirect"] : undefined,
+    modo: search["modo"] === "registro" ? "registro" : undefined,
   }),
   head: () => ({
     meta: [
@@ -91,7 +91,10 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) return toast.error(translateError(error.message));
+    if (error) {
+      toast.error(translateError(error.message));
+      return;
+    }
     if (!data.session) setSentTo(email);
   }
 
@@ -103,7 +106,10 @@ function AuthPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setBusy(false);
-    if (error) return toast.error(translateError(error.message));
+    if (error) {
+      toast.error(translateError(error.message));
+      return;
+    }
     setResetSent(true);
   }
 

@@ -31,9 +31,9 @@ interface Props {
   /** Productos disponibles para el usuario (para los contadores por fuente). */
   products: Product[];
   /** Plan Gratuito: país fijo, sin selector. */
-  lockedCountry?: CountryCode | null;
+  lockedCountry?: CountryCode | null | undefined;
   /** Plan Gratuito: filtro de saturación bloqueado. */
-  saturationLocked?: boolean;
+  saturationLocked?: boolean | undefined;
   onChange: (next: ProductFilters) => void;
   onReset: () => void;
 }
