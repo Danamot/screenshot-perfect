@@ -7,8 +7,8 @@ import {
   COUNTRIES,
   COUNTRY_ORDER,
   PRODUCTS,
-  SOURCES,
   SOURCE_ORDER,
+  type SourceId,
   filterProducts,
   marginPercent,
   priceParts,
@@ -34,6 +34,13 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+const SOURCE_SHORT: Record<SourceId, string> = {
+  tiktok: "TikTok",
+  instagram: "Instagram",
+  mercadolibre: "Mercado Libre",
+  google: "Google Trends",
+};
 
 const ADVANTAGES = [
   {
@@ -132,7 +139,7 @@ function Landing() {
             {SOURCE_ORDER.map((s) => (
               <span key={s} className="flex items-center gap-2 text-sm text-muted-foreground">
                 <PlatformIcon source={s} />
-                <span className="hidden sm:inline">{SOURCES[s].label.split(" ")[0] === "Mercado" ? "Mercado Libre" : SOURCES[s].label.split(" ")[0]}</span>
+                <span className="hidden sm:inline">{SOURCE_SHORT[s]}</span>
               </span>
             ))}
           </div>
