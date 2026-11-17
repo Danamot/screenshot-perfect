@@ -79,6 +79,13 @@ function AccountMenu({ userId, email }: { userId: string; email: string }) {
           {account && <PlanBadge plan={account.plan} isAdmin={account.isAdmin} />}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {account?.isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin">
+              <ShieldCheck /> Panel de Administración
+            </Link>
+          </DropdownMenuItem>
+        )}
         {account && !account.isAdmin && account.plan === "free" && (
           <DropdownMenuItem asChild>
             <Link to="/precios">
@@ -94,10 +101,15 @@ function AccountMenu({ userId, email }: { userId: string; email: string }) {
   );
 }
 
+const ADMIN_LINK = { to: "/admin", label: "Panel de Administración" } as const;
+
 export function TopNav() {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const signOut = useSignOut();
+  // Solo muestra u oculta el enlace; la página y la base de datos vuelven a verificar el rol.
+  const { data: account } = useQuery({ ...accountQueryOptions(user?.id ?? ""), enabled: !!user });
+  const links = user && account?.isAdmin ? [...NAV, ADMIN_LINK] : NAV;
 
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -107,7 +119,7 @@ export function TopNav() {
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
+          {links.map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -116,6 +128,7 @@ export function TopNav() {
               activeProps={{ className: "bg-accent text-foreground" }}
               inactiveProps={{ className: "text-muted-foreground hover:text-foreground" }}
             >
+              {item.to === "/admin" && <ShieldCheck className="mr-1.5 inline h-4 w-4 text-success" />}
               {item.label}
             </Link>
           ))}
@@ -146,7 +159,7 @@ export function TopNav() {
                 </SheetTitle>
               </SheetHeader>
               <nav aria-label="Menú móvil" className="mt-6 flex flex-col gap-1">
-                {NAV.map((item) => (
+                {links.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}

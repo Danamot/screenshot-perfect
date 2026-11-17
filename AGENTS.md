@@ -33,10 +33,11 @@ use the editor.
 
 - Products live in the database `products` table; `src/lib/products.ts` holds the row→card mapping (`rowToProduct`), filter logic and formatting helpers; UI components in `src/components/dashboard/` only render — keeps filter rules unit-testable (`src/lib/products.test.ts`).
 - The app is dark-only: dark palette lives directly on `:root` in `src/styles.css` and `<html>` carries `dark`; there is no theme toggle.
-- Shared top navigation and the toast container live in `src/routes/__root.tsx` around `<Outlet />`; pages are separate routes (`/` landing, `/explorar` dashboard under `_authenticated/`, `/precios`, `/auth`, `/reset-password`) so each has its own head metadata.
+- Shared top navigation and the toast container live in `src/routes/__root.tsx` around `<Outlet />`; pages are separate routes (`/` landing, `/explorar` dashboard and `/admin` panel under `_authenticated/`, `/precios`, `/auth`, `/reset-password`) so each has its own head metadata.
 - Plan names, prices and limits live in `src/lib/plans.ts` (tested in `src/lib/plans.test.ts`); pricing UI only renders them.
 
 - Plan limits are enforced in the database (`get_dashboard_products`, `set_my_country` SECURITY DEFINER functions, column grants + guard trigger on `profiles`); `getAccess()` in `src/lib/plans.ts` only mirrors them for the UI — never trust the client for plan gating.
 - Admin status lives in `user_roles` (`has_role`), never as a column on `profiles` — prevents self-promotion via profile updates.
 - One auth listener: `AuthProvider` in `src/hooks/use-auth.tsx` (mounted in `__root`) owns session state and router/query invalidation; account + dashboard queries live in `src/lib/account.ts`.
 - Product photos are served from `public/products/` and referenced by `imagen_url` paths — public storage buckets are blocked on this workspace.
+- Admin panel product writes go straight to the `products` table from the browser (admin-only RLS is the boundary); form parsing/validation lives in `src/lib/admin.ts` (tested in `src/lib/admin.test.ts`). AI analysis runs server-side in `src/lib/ai/analysis.server.ts` behind the admin-checked `generateAnalysis` server function — keeps the AI key off the client.

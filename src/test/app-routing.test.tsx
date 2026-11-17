@@ -24,4 +24,9 @@ describe("App routing", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     expect(router.matchRoutes("/explorar").at(-1)?.routeId).toBe("/_authenticated/explorar");
   });
+
+  it("keeps the admin panel at /admin behind sign-in", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes("/admin").at(-1)?.routeId).toBe("/_authenticated/admin");
+  });
 });
