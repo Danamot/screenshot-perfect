@@ -230,7 +230,7 @@ function Dashboard() {
           )}
 
           {needsCountry ? (
-            <CountryPicker userId={user.id} />
+            !activating && <CountryPicker userId={user.id} />
           ) : (
             <>
               {!access.fullAccess && account.pais && <FreePlanBanner country={account.pais} shown={products.length} />}
