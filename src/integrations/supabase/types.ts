@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      payment_events: {
+        Row: {
+          event_type: string
+          received_at: string
+          subscription_id: string | null
+          user_id: string | null
+          webhook_id: string
+        }
+        Insert: {
+          event_type: string
+          received_at?: string
+          subscription_id?: string | null
+          user_id?: string | null
+          webhook_id: string
+        }
+        Update: {
+          event_type?: string
+          received_at?: string
+          subscription_id?: string | null
+          user_id?: string | null
+          webhook_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           analisis_ia: Json | null
@@ -86,29 +110,41 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          dodo_customer_id: string | null
+          dodo_subscription_id: string | null
           email: string | null
           id: string
           nombre: string | null
           pais: string | null
           plan: string
+          plan_updated_at: string | null
+          subscription_status: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          dodo_customer_id?: string | null
+          dodo_subscription_id?: string | null
           email?: string | null
           id: string
           nombre?: string | null
           pais?: string | null
           plan?: string
+          plan_updated_at?: string | null
+          subscription_status?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          dodo_customer_id?: string | null
+          dodo_subscription_id?: string | null
           email?: string | null
           id?: string
           nombre?: string | null
           pais?: string | null
           plan?: string
+          plan_updated_at?: string | null
+          subscription_status?: string | null
           updated_at?: string
         }
         Relationships: []

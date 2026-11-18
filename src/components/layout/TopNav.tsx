@@ -15,6 +15,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { accountQueryOptions } from "@/lib/account";
+import { useProCheckout } from "@/hooks/use-pro-checkout";
 import { BrandLogo } from "./BrandLogo";
 
 const NAV = [
@@ -59,6 +60,7 @@ function PlanBadge({ plan, isAdmin }: { plan: "free" | "pro"; isAdmin: boolean }
 function AccountMenu({ userId, email }: { userId: string; email: string }) {
   const { data: account } = useQuery(accountQueryOptions(userId));
   const signOut = useSignOut();
+  const startCheckout = useProCheckout();
   const name = account?.nombre || email.split("@")[0] || "Mi cuenta";
   const initial = name.charAt(0).toUpperCase();
 
@@ -87,10 +89,8 @@ function AccountMenu({ userId, email }: { userId: string; email: string }) {
           </DropdownMenuItem>
         )}
         {account && !account.isAdmin && account.plan === "free" && (
-          <DropdownMenuItem asChild>
-            <Link to="/precios">
-              <Crown /> Mejorar a Pro
-            </Link>
+          <DropdownMenuItem onSelect={startCheckout}>
+            <Crown /> Mejorar a Pro
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onSelect={() => void signOut()}>

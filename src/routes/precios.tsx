@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Crown, Minus } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PLANS, formatPlanPrice, type Plan } from "@/lib/plans";
+import { useProCheckout } from "@/hooks/use-pro-checkout";
 
 export const Route = createFileRoute("/precios")({
   head: () => ({
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/precios")({
 
 function PlanCard({ plan }: { plan: Plan }) {
   const pro = plan.id === "pro";
+  const startCheckout = useProCheckout();
   return (
     <article
       aria-label={`${plan.name}, ${formatPlanPrice(plan)} por mes`}
@@ -70,11 +71,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           variant="glow"
           size="lg"
           className="h-12 w-full"
-          onClick={() =>
-            toast("El Plan Pro estará disponible muy pronto", {
-              description: "Todavía no aceptamos pagos. Puedes seguir usando el dashboard gratis.",
-            })
-          }
+          onClick={startCheckout}
         >
           Quiero el Plan Pro
         </Button>

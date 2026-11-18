@@ -16,6 +16,7 @@ import { Route as PreciosRouteImport } from './routes/precios'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
+import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const AuthenticatedExplorarRoute = AuthenticatedExplorarRouteImport.update({
   path: '/explorar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
+  id: '/api/public/dodo-webhook',
+  path: '/api/public/dodo-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/explorar': typeof AuthenticatedExplorarRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/explorar': typeof AuthenticatedExplorarRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,13 +85,27 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/explorar': typeof AuthenticatedExplorarRoute
+  '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/precios' | '/reset-password' | '/admin' | '/explorar'
+    | '/'
+    | '/auth'
+    | '/precios'
+    | '/reset-password'
+    | '/admin'
+    | '/explorar'
+    | '/api/public/dodo-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/precios' | '/reset-password' | '/admin' | '/explorar'
+  to:
+    | '/'
+    | '/auth'
+    | '/precios'
+    | '/reset-password'
+    | '/admin'
+    | '/explorar'
+    | '/api/public/dodo-webhook'
   id:
     | '__root__'
     | '/'
@@ -93,6 +115,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/admin'
     | '/_authenticated/explorar'
+    | '/api/public/dodo-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -101,6 +124,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PreciosRoute: typeof PreciosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExplorarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/dodo-webhook': {
+      id: '/api/public/dodo-webhook'
+      path: '/api/public/dodo-webhook'
+      fullPath: '/api/public/dodo-webhook'
+      preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -176,6 +207,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PreciosRoute: PreciosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

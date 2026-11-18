@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useProCheckout } from "@/hooks/use-pro-checkout";
 import { Globe2, Lock, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -47,13 +47,16 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function ProChip() {
+  const startCheckout = useProCheckout();
   return (
-    <Link
-      to="/precios"
+    <button
+      type="button"
+      onClick={startCheckout}
+      aria-label="Quiero el Plan Pro"
       className="ml-2 inline-flex items-center gap-1 rounded-full bg-gradient-brand px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-primary-foreground normal-case"
     >
       <Lock className="h-2.5 w-2.5" /> PRO
-    </Link>
+    </button>
   );
 }
 

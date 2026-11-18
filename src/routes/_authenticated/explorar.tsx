@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Activity, Crown, Flame, Loader2, MapPin, PackageSearch, SearchX } from "lucide-react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/dashboard/ProductCard";
 import { AnalysisDialog } from "@/components/dashboard/AnalysisDialog";
 import { accountQueryOptions, dashboardProductsQueryOptions, setMyCountry } from "@/lib/account";
 import { getAccess } from "@/lib/plans";
+import { useProCheckout } from "@/hooks/use-pro-checkout";
 import {
   COUNTRIES,
   COUNTRY_ORDER,
@@ -20,6 +21,9 @@ import {
 } from "@/lib/products";
 
 export const Route = createFileRoute("/_authenticated/explorar")({
+  validateSearch: (search: Record<string, unknown>): { pago?: "ok" | undefined } => ({
+    pago: search["pago"] === "ok" ? "ok" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Explorar productos ganadores — TrendLatam AI" },
@@ -113,6 +117,7 @@ function CountryPicker({ userId }: { userId: string }) {
 }
 
 function FreePlanBanner({ country, shown }: { country: CountryCode; shown: number }) {
+  const startCheckout = useProCheckout();
   return (
     <section className="flex flex-col items-start justify-between gap-4 rounded-xl border border-primary/30 bg-accent/40 px-5 py-4 sm:flex-row sm:items-center">
       <p className="text-sm">
@@ -122,13 +127,47 @@ function FreePlanBanner({ country, shown }: { country: CountryCode; shown: numbe
           Filtros de saturación y análisis de IA disponibles en Pro.
         </span>
       </p>
-      <Button variant="glow" size="sm" className="shrink-0" asChild>
-        <Link to="/precios">
-          <Crown /> Mejorar a Pro
-        </Link>
+      <Button variant="glow" size="sm" className="shrink-0" onClick={startCheckout}>
+        <Crown /> Quiero el Plan Pro
       </Button>
     </section>
   );
+}
+
+/** Tras volver del pago, espera a que el webhook active el Plan Pro (hasta ~1 minuto). */
+function useActivationAfterPayment(userId: string, paid: boolean, fullAccess: boolean) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [waiting, setWaiting] = useState(false);
+
+  useEffect(() => {
+    if (!paid) return;
+    if (fullAccess) {
+      if (waiting) toast.success("¡Tu Plan Pro está activo! Ya ves todos los productos.");
+      setWaiting(false);
+      navigate({ to: "/explorar", search: {}, replace: true });
+      return;
+    }
+    setWaiting(true);
+    let tries = 0;
+    const id = window.setInterval(() => {
+      tries += 1;
+      void queryClient.invalidateQueries({ queryKey: ["account", userId] });
+      void queryClient.invalidateQueries({ queryKey: ["dashboard-products", userId] });
+      if (tries >= 20) {
+        window.clearInterval(id);
+        setWaiting(false);
+        toast("Tu pago se está procesando", {
+          description: "El Plan Pro se activará en unos minutos. Recarga la página más tarde.",
+        });
+        navigate({ to: "/explorar", search: {}, replace: true });
+      }
+    }, 3000);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paid, fullAccess]);
+
+  return waiting;
 }
 
 function Dashboard() {
@@ -136,6 +175,8 @@ function Dashboard() {
   const { data: account } = useSuspenseQuery(accountQueryOptions(user.id));
   const { data: products } = useSuspenseQuery(dashboardProductsQueryOptions(user.id));
   const access = getAccess(account);
+  const { pago } = Route.useSearch();
+  const activating = useActivationAfterPayment(user.id, pago === "ok", access.fullAccess);
 
   const [filters, setFilters] = useState<ProductFilters>(DEFAULT_FILTERS);
   const [selected, setSelected] = useState<Product | null>(null);
@@ -180,6 +221,13 @@ function Dashboard() {
               Ordenados por viralidad combinada en redes sociales y marketplaces.
             </p>
           </header>
+
+          {activating && (
+            <section className="flex items-center gap-3 rounded-xl border border-success/30 bg-success/10 px-5 py-4 text-sm">
+              <Loader2 className="h-4 w-4 animate-spin text-success" />
+              <span>¡Gracias por tu pago! Estamos activando tu Plan Pro…</span>
+            </section>
+          )}
 
           {needsCountry ? (
             <CountryPicker userId={user.id} />

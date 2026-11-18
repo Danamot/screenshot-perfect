@@ -1,5 +1,5 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Link } from "@tanstack/react-router";
+import { useProCheckout } from "@/hooks/use-pro-checkout";
 import { BadgeDollarSign, Crown, ExternalLink, Lock, Megaphone, Percent, Sparkles, Store } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,15 @@ export function AnalysisDialog({
         {product && <AnalysisBody product={product} />}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function UpgradeButton() {
+  const startCheckout = useProCheckout();
+  return (
+    <Button variant="glow" size="sm" onClick={startCheckout}>
+      <Crown /> Quiero el Plan Pro
+    </Button>
   );
 }
 
@@ -155,11 +164,7 @@ function AnalysisBody({ product }: { product: Product }) {
               <p className="flex items-center gap-2 text-sm font-semibold">
                 <Lock className="h-4 w-4 text-primary-glow" /> El análisis de IA completo es parte del Plan Pro
               </p>
-              <Button variant="glow" size="sm" asChild>
-                <Link to="/precios">
-                  <Crown /> Ver Plan Pro
-                </Link>
-              </Button>
+              <UpgradeButton />
             </div>
           </section>
         )}
