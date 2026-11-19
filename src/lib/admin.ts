@@ -210,15 +210,22 @@ export async function isCurrentUserAdmin(userId: string) {
   return data === true;
 }
 
+/** Un producto se identifica por nombre + país (índice único en la base de datos). */
+function friendlyError(error: { code?: string; message: string }) {
+  if (error.code === "23505" && error.message.includes("products_nombre_pais_unique"))
+    return new Error("Ya existe un producto con ese nombre en ese país. Edítalo en la lista.");
+  return error;
+}
+
 export async function createProduct(values: ProductValues) {
   const suffix = Math.random().toString(36).slice(2, 6);
   const { error } = await supabase.from("products").insert(valuesToInsert(values, suffix));
-  if (error) throw error;
+  if (error) throw friendlyError(error);
 }
 
 export async function updateProduct(id: string, values: ProductValues) {
   const { error } = await supabase.from("products").update(valuesToUpdate(values)).eq("id", id);
-  if (error) throw error;
+  if (error) throw friendlyError(error);
 }
 
 export async function deleteProduct(id: string) {

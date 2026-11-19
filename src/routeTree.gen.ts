@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo-webhook'
+import { Route as ApiPublicMakeProductsRouteImport } from './routes/api/public/make-products'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
   path: '/api/public/dodo-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMakeProductsRoute = ApiPublicMakeProductsRouteImport.update({
+  id: '/api/public/make-products',
+  path: '/api/public/make-products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/explorar': typeof AuthenticatedExplorarRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/make-products': typeof ApiPublicMakeProductsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/explorar': typeof AuthenticatedExplorarRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/make-products': typeof ApiPublicMakeProductsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/explorar': typeof AuthenticatedExplorarRoute
   '/api/public/dodo-webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/make-products': typeof ApiPublicMakeProductsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/explorar'
     | '/api/public/dodo-webhook'
+    | '/api/public/make-products'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/explorar'
     | '/api/public/dodo-webhook'
+    | '/api/public/make-products'
   id:
     | '__root__'
     | '/'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/explorar'
     | '/api/public/dodo-webhook'
+    | '/api/public/make-products'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   PreciosRoute: typeof PreciosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
+  ApiPublicMakeProductsRoute: typeof ApiPublicMakeProductsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/make-products': {
+      id: '/api/public/make-products'
+      path: '/api/public/make-products'
+      fullPath: '/api/public/make-products'
+      preLoaderRoute: typeof ApiPublicMakeProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreciosRoute: PreciosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
+  ApiPublicMakeProductsRoute: ApiPublicMakeProductsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
