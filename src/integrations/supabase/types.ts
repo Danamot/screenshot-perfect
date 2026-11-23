@@ -172,6 +172,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_product_photo: { Args: { _name: string }; Returns: boolean }
       get_dashboard_products: {
         Args: never
         Returns: {

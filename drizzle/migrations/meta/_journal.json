@@ -36,6 +36,13 @@
       "when": 1795477150458,
       "tag": "0004_storage_producto_fotos_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795477468270,
+      "tag": "0005_restrict_producto_fotos_read",
+      "breakpoints": true
     }
   ]
 }
