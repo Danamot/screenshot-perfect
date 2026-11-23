@@ -29,6 +29,13 @@
       "when": 1795120845847,
       "tag": "0003_unique_product_per_country",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795477150458,
+      "tag": "0004_storage_producto_fotos_policies",
+      "breakpoints": true
     }
   ]
 }
