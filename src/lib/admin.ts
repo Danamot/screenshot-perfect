@@ -1,6 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { withSignedRowPhotos } from "@/lib/product-images";
+import { isBucketImage } from "@/lib/photo-paths";
 import {
   COUNTRIES,
   SATURATION_ORDER,
@@ -122,8 +124,8 @@ export function validateForm(form: ProductForm): { ok: true; values: ProductValu
   if (!Number.isInteger(crecimiento) || crecimiento < -100 || crecimiento > 1000)
     errors.crecimiento_7d = "Un número entero, ej. 24 o -5.";
   if (form.fuentes.length === 0) errors.fuentes = "Marca al menos una fuente.";
-  if (imagen && !imagen.startsWith("/") && !/^https:\/\//i.test(imagen))
-    errors.imagen_url = "Usa una dirección que empiece con https:// o /products/.";
+  if (imagen && !imagen.startsWith("/") && !/^https:\/\//i.test(imagen) && !isBucketImage(imagen))
+    errors.imagen_url = "Sube una foto o usa una dirección que empiece con https://.";
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
@@ -200,7 +202,7 @@ export const adminProductsQueryOptions = () =>
         .order("created_at", { ascending: false })
         .order("viralidad", { ascending: false });
       if (error) throw error;
-      return data;
+      return withSignedRowPhotos(data);
     },
   });
 

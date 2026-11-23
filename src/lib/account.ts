@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { rowToProduct, type CountryCode } from "@/lib/products";
+import { withSignedPhotos } from "@/lib/product-images";
 import type { PlanId } from "@/lib/plans";
 
 export interface Account {
@@ -39,7 +40,7 @@ export const dashboardProductsQueryOptions = (userId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_dashboard_products");
       if (error) throw error;
-      return (data ?? []).map(rowToProduct);
+      return withSignedPhotos((data ?? []).map(rowToProduct));
     },
   });
 

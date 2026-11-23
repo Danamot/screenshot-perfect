@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { isBucketImage } from "@/lib/photo-paths";
 
 /** Top 3 público de la portada (sin análisis de IA). */
 export const getLandingPreview = createServerFn({ method: "GET" }).handler(async () => {
@@ -26,6 +27,6 @@ export const getLandingPreview = createServerFn({ method: "GET" }).handler(async
     margen: r.margen,
     saturacion: r.saturacion,
     viralidad: r.viralidad,
-    imagen: r.imagen_url ?? "",
+    imagen: isBucketImage(r.imagen_url) ? "" : (r.imagen_url ?? ""),
   }));
 });

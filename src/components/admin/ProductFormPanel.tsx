@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ImageOff, Loader2, Plus, Save, Sparkles, X } from "lucide-react";
+import { ImageOff, Loader2, Plus, Save, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,8 @@ import {
   type SaturationLevel,
 } from "@/lib/products";
 import { cn } from "@/lib/utils";
+import { isBucketImage } from "@/lib/photo-paths";
+import { signedPhotoUrl, uploadProductPhoto } from "@/lib/product-images";
 
 function Field({
   id,
@@ -71,11 +73,44 @@ export function ProductFormPanel({ editing, onDone }: { editing: AdminProductRow
   const [form, setForm] = useState<ProductForm>(() => (editing ? rowToForm(editing) : emptyForm()));
   const [errors, setErrors] = useState<FormErrors>({});
   const [imageFailed, setImageFailed] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
   const runAnalysis = useServerFn(generateAnalysis);
 
   const set = <K extends keyof ProductForm>(key: K, value: ProductForm[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
+  };
+
+  // Una foto del bucket es privada: la vista previa necesita un enlace temporal.
+  useEffect(() => {
+    const raw = form.imagen_url.trim();
+    if (!isBucketImage(raw)) {
+      setPreviewSrc(raw || null);
+      return;
+    }
+    let alive = true;
+    void signedPhotoUrl(raw).then((url) => {
+      if (alive) setPreviewSrc(url);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [form.imagen_url]);
+
+  const uploadPhoto = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const path = await uploadProductPhoto(file);
+      set("imagen_url", path);
+      setImageFailed(false);
+      toast.success("Foto subida. Guarda el producto para que aparezca en el dashboard.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo subir la foto.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const save = useMutation({
@@ -303,9 +338,9 @@ export function ProductFormPanel({ editing, onDone }: { editing: AdminProductRow
 
       <Field
         id="imagen"
-        label="URL de la imagen"
+        label="Imagen"
         error={errors.imagen_url}
-        hint="Una dirección https:// o una foto de la app, ej. /products/lampara-luna.jpg"
+        hint="Sube una foto desde tu computadora o pega una dirección https://"
       >
         <div className="flex gap-3">
           <Input
@@ -318,10 +353,24 @@ export function ProductFormPanel({ editing, onDone }: { editing: AdminProductRow
             placeholder="https://…"
             className={inputCls}
           />
+          <label className="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-border bg-surface-elevated px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+            <input
+              type="file"
+              accept="image/*"
+              aria-label="Subir foto del producto"
+              className="sr-only"
+              onChange={(e) => {
+                void uploadPhoto(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+            {uploading ? "Subiendo…" : "Subir"}
+          </label>
           <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-surface-elevated">
-            {form.imagen_url.trim() && !imageFailed ? (
+            {previewSrc && !imageFailed ? (
               <img
-                src={form.imagen_url.trim()}
+                src={previewSrc}
                 alt="Vista previa"
                 className="h-full w-full object-cover"
                 onError={() => setImageFailed(true)}
